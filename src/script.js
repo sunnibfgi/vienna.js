@@ -81,6 +81,9 @@
 
   slideShow.prototype.start = function(e) {
     var viewport = this.child[0].parentNode
+    if(!isTouch()) {
+      e.preventDefault()
+    }
     if(isTouch()) {
       var touches = e.touches[0]
       this.pageX = touches.pageX
@@ -98,7 +101,6 @@
   }
 
   slideShow.prototype.move = function(e) {
-    e.preventDefault()
     var viewport = this.child[0].parentNode
     if(isTouch()) {
       var touches = e.touches
@@ -202,3 +204,4 @@
   window.slideShow = slideShow
 
 })()
+
