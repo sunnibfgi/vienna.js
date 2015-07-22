@@ -98,6 +98,7 @@
   }
 
   slideShow.prototype.move = function(e) {
+    e.preventDefault()
     var viewport = this.child[0].parentNode
     if(isTouch()) {
       var touches = e.touches
@@ -139,7 +140,7 @@
     }
     setProp(viewport, {
       left: '-' + this.index * this.child[0].offsetWidth + 'px',
-      transition: 'left .2s linear'
+      transition: 'left .3s linear'
     })
     if(this.isMoving) {
       this.isMoving = false
