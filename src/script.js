@@ -1,5 +1,6 @@
 // script.js
 // 2015.7.22
+// low browser does not support certain features
 
 ;(function() {
 
@@ -76,7 +77,6 @@
     if(span && span.length) {
       span[this.index].className = 'active'
     }
-    this.transitionEnd()
   }
 
   slideShow.prototype.start = function(e) {
@@ -148,7 +148,7 @@
     }
   }
 
-  slideShow.prototype.transitionEnd = function() {
+  slideShow.prototype.transitionEnd = function(options) {
     var viewport = this.child[0].parentNode
     setProp(viewport, {
       transition: 'none'
@@ -160,6 +160,8 @@
       }
       span[this.index].className = 'active'
     }
+    console.log(this.index)
+
   }
 
   slideShow.prototype.onResize = function() {

@@ -34,18 +34,19 @@
       <p><img src="img/t300x182 (5).jpg"></p>
       <p><img src="img/t300x182 (8).jpg"></p>
       <p><img src="img/t300x182 (10).jpg"></p>
-
       <p><img src="img/t300x182 (2).jpg"></p>
-
       <p><img src="img/t300x182 (3).jpg"></p>
       <p><img src="img/t300x182 (4).jpg"></p>
     </div>
   </div>
   <script type="text/javascript" src="src/script.js"></script>
   <script>
-     slideShow({
+  slideShow({
     selector: '#slide p',
-    hasNav: true
+    hasNav: true,
+    transitionCallback: function(el, idx){
+      alert(idx)
+    }
   })
   </script>
 </body>
