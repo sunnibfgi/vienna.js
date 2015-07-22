@@ -115,14 +115,12 @@
       this.diffY = e.pageY - this.pageY
     }
     if(this.isMoving) {
-
       if(Math.abs(this.diffX) >= Math.abs(this.diffY)) {
         e.preventDefault()
         setProp(viewport, {
           left: this.pos + this.diffX + 'px'
         })
       }
-
     }
 
   }
