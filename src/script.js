@@ -45,8 +45,8 @@
     this.index = options.index || 0
     this.isMoving = false
     this.timediff = this.timediff || 1000
-    this.pageX = this.pageY = this.pos = 0
     this.diffX = this.diffY = null
+    this.pageX = this.pageY = this.pos = 0
     this.constructor = slideShow
     this.init(options)
   }
@@ -81,6 +81,7 @@
 
   slideShow.prototype.start = function(e) {
     var viewport = this.child[0].parentNode
+
     if(!isTouch()) {
       e.preventDefault()
     }
@@ -98,6 +99,7 @@
       this.pos = parseInt(viewport.style.left)
       this.startTime = Date.now()
     }
+
   }
 
   slideShow.prototype.move = function(e) {
@@ -109,9 +111,7 @@
         this.diffX = touch.pageX - this.pageX
         this.diffY = touch.pageY - this.pageY
       }
-      else {
-        e.preventDefault()
-      }
+
     }
     else {
       this.diffX = e.pageX - this.pageX
@@ -125,21 +125,25 @@
         })
       }
     }
-
   }
 
   slideShow.prototype.end = function(e) {
-    e.preventDefault()
+    //
     this.endTime = Date.now()
     var viewport = this.child[0].parentNode
-    if(this.endTime - this.startTime <= this.timediff && Math.abs(this.diffX) >= Math.abs(this.diffY)) {
-      if((this.diffX >= (this.el.offsetWidth / 2)) || this.diffX > 5) {
-        this.index = Math.max(0, this.index -= 1)
-      }
-      else if((Math.abs(this.diffX) >= (this.el.offsetWidth / 2)) || Math.abs(this.diffX) > 5) {
-        this.index = Math.min(this.index += 1, this.child.length - 1)
-      }
+    if(Math.abs(this.diffX) >= Math.abs(this.diffY) || !isTouch()) {
+      e.preventDefault()
     }
+    if(((this.diffX >= (this.el.offsetWidth / 2)) || this.diffX > 10) && Math.abs(this.diffX) >= Math.abs(this.diffY)) {
+      this.diffX = null
+
+      this.index = Math.max(0, this.index -= 1)
+    }
+    else if(((Math.abs(this.diffX) >= (this.el.offsetWidth / 2)) || Math.abs(this.diffX) > 10) && Math.abs(this.diffX) >= Math.abs(this.diffY)) {
+      this.diffX = null
+      this.index = Math.min(this.index += 1, this.child.length - 1)
+    }
+
     setProp(viewport, {
       left: '-' + this.index * this.child[0].offsetWidth + 'px',
       transition: 'left .3s linear'
@@ -193,15 +197,9 @@
       document.addEventListener('touchend', this.end.bind(this), false)
       window.addEventListener('resize', this.onResize.bind(this), false)
     }
-    else {
-      this.el.onmousedown = this.el.ontouchstart = this.start.bind(this)
-      document.onmousemove = document.ontouchmove = this.move.bind(this)
-      document.onmouseup = document.ontouchend = this.end.bind(this)
-      window.onresize = this.onResize.bind(this)
-    }
+
   }
 
   window.slideShow = slideShow
 
 })()
-
