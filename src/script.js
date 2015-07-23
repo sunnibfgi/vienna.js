@@ -1,5 +1,5 @@
 // script.js
-// 2015.7.22
+// 2015-7-22
 // low browser does not support certain features
 
 ;(function() {
@@ -128,29 +128,30 @@
   }
 
   slideShow.prototype.end = function(e) {
-    //
     this.endTime = Date.now()
     var viewport = this.child[0].parentNode
-    if(Math.abs(this.diffX) >= Math.abs(this.diffY) || !isTouch()) {
+    if(this.isMoving && Math.abs(this.diffX) >= Math.abs(this.diffY)) {
       e.preventDefault()
-    }
-    if(((this.diffX >= (this.el.offsetWidth / 2)) || this.diffX > 10) && Math.abs(this.diffX) >= Math.abs(this.diffY)) {
-      this.diffX = null
+      var diffTime = this.endTime - this.startTime <= this.timediff
+      if(this.diffX >= this.el.offsetWidth / 2 ||
+        (this.diffX > 10 && diffTime)) {
+        this.diffX = null
+        this.index = Math.max(0, this.index -= 1)
+      }
 
-      this.index = Math.max(0, this.index -= 1)
-    }
-    else if(((Math.abs(this.diffX) >= (this.el.offsetWidth / 2)) || Math.abs(this.diffX) > 10) && Math.abs(this.diffX) >= Math.abs(this.diffY)) {
-      this.diffX = null
-      this.index = Math.min(this.index += 1, this.child.length - 1)
+      else if(Math.abs(this.diffX) >= this.el.offsetWidth / 2 ||
+        (Math.abs(this.diffX) > 10 && diffTime)) {
+        this.diffX = null
+        this.index = Math.min(this.index += 1, this.child.length - 1)
+      }
+      this.isMoving = false
     }
 
     setProp(viewport, {
       left: '-' + this.index * this.child[0].offsetWidth + 'px',
       transition: 'left .3s linear'
     })
-    if(this.isMoving) {
-      this.isMoving = false
-    }
+
   }
 
   slideShow.prototype.transitionEnd = function(options) {
@@ -165,7 +166,6 @@
       }
       span[this.index].className = 'active'
     }
-    console.log(this.index)
 
   }
 
@@ -196,6 +196,12 @@
       document.addEventListener('touchmove', this.move.bind(this), false)
       document.addEventListener('touchend', this.end.bind(this), false)
       window.addEventListener('resize', this.onResize.bind(this), false)
+    }
+    else {
+      this.el.onmousedown = this.el.ontouchstart = this.start.bind(this)
+      document.onmousemove = document.ontouchmove = this.move.bind(this)
+      document.onmouseup = document.ontouchend = this.end.bind(this)
+      window.onresize = this.onResize.bind(this)
     }
 
   }
