@@ -1,5 +1,5 @@
 // script.js
-// last modify: 2015-7-27
+// last modify: 2015-07-27
 // low browser does not support certain features
 
 ;(function() {
