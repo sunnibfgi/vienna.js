@@ -110,7 +110,6 @@
       return false
     }
     if(this.isPress) {
-
       this.isMoving = true
     }
     var viewport = this.child[0].parentNode
@@ -180,7 +179,6 @@
     setProp(viewport, {
       transition: 'none'
     })
-
   }
 
   slideShow.prototype.onResize = function() {
