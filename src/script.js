@@ -1,5 +1,5 @@
 // script.js
-// 2015-7-22
+// last modify: 2015-7-27
 // low browser does not support certain features
 
 ;(function() {
@@ -43,8 +43,8 @@
     this.el = $(options.el || '#slide')
     this.child = $(options.selector)
     this.index = options.index || 0
-    this.isMoving = false
-    this.timediff = this.timediff || 1000
+    this.isMoving = this.isPress = false
+    this.timediff = this.timediff || 500
     this.diffX = this.diffY = null
     this.pageX = this.pageY = this.pos = 0
     this.constructor = slideShow
@@ -94,8 +94,10 @@
       this.pageX = e.pageX
       this.pageY = e.pageY
     }
+    if(!this.isPress) {
+      this.isPress = true
+    }
     if(!this.isMoving) {
-      this.isMoving = true
       this.pos = parseInt(viewport.style.left)
       this.startTime = Date.now()
     }
@@ -103,7 +105,16 @@
   }
 
   slideShow.prototype.move = function(e) {
+    e.preventDefault()
+
+    if(!this.el.contains(e.target)) {
+      return false
+    }
+    if(this.isPress) {
+      this.isMoving = true
+    }
     var viewport = this.child[0].parentNode
+
     if(isTouch()) {
       var touches = e.touches
       if(touches.length === 1) {
@@ -111,53 +122,48 @@
         this.diffX = touch.pageX - this.pageX
         this.diffY = touch.pageY - this.pageY
       }
-
     }
     else {
       this.diffX = e.pageX - this.pageX
       this.diffY = e.pageY - this.pageY
     }
-    if(this.isMoving) {
-      if(Math.abs(this.diffX) >= Math.abs(this.diffY)) {
-        e.preventDefault()
-        setProp(viewport, {
-          left: this.pos + this.diffX + 'px'
-        })
-      }
+    if(Math.abs(this.diffX) >= Math.abs(this.diffY)) {
+      setProp(viewport, {
+        left: this.pos + this.diffX + 'px'
+      })
+
     }
   }
 
   slideShow.prototype.end = function(e) {
     this.endTime = Date.now()
     var viewport = this.child[0].parentNode
-    if(this.isMoving && Math.abs(this.diffX) >= Math.abs(this.diffY)) {
+    if(this.isMoving) {
       e.preventDefault()
-      var diffTime = this.endTime - this.startTime <= this.timediff
-      if(this.diffX >= this.el.offsetWidth / 2 ||
-        (this.diffX > 10 && diffTime)) {
-        this.diffX = null
-        this.index = Math.max(0, this.index -= 1)
-      }
+      if(Math.abs(this.diffX) >= Math.abs(this.diffY)) {
+        var diffTime = this.endTime - this.startTime <= this.timediff
+        if(this.diffX >= this.el.offsetWidth / 2 ||
+          (this.diffX > 20 && diffTime)) {
+          this.diffX = null
+          this.index = Math.max(0, this.index -= 1)
+        }
 
-      else if(Math.abs(this.diffX) >= this.el.offsetWidth / 2 ||
-        (Math.abs(this.diffX) > 10 && diffTime)) {
-        this.diffX = null
-        this.index = Math.min(this.index += 1, this.child.length - 1)
+        else if(Math.abs(this.diffX) >= this.el.offsetWidth / 2 ||
+          (Math.abs(this.diffX) > 20 && diffTime)) {
+          this.diffX = null
+          this.index = Math.min(this.index += 1, this.child.length - 1)
+        }
       }
       this.isMoving = false
+
+    }
+    if(this.isPress) {
+      this.isPress = false
     }
 
     setProp(viewport, {
       left: '-' + this.index * this.child[0].offsetWidth + 'px',
-      transition: 'left .3s linear'
-    })
-
-  }
-
-  slideShow.prototype.transitionEnd = function(options) {
-    var viewport = this.child[0].parentNode
-    setProp(viewport, {
-      transition: 'none'
+      transition: 'left 200ms linear'
     })
     var span = $('.slide-nav span')
     if(span && span.length) {
@@ -166,6 +172,13 @@
       }
       span[this.index].className = 'active'
     }
+  }
+
+  slideShow.prototype.transitionEnd = function(options) {
+    var viewport = this.child[0].parentNode
+    setProp(viewport, {
+      transition: 'none'
+    })
 
   }
 
@@ -187,12 +200,9 @@
   slideShow.prototype.init = function(options) {
     this.setup(options)
     if(!!window.addEventListener) {
-      this.el.addEventListener('mousedown', this.start.bind(this), false)
       this.el.addEventListener('touchstart', this.start.bind(this), false)
       this.el.addEventListener('webkitTransitionEnd', this.transitionEnd.bind(this), false)
       this.el.addEventListener('transitionend', this.transitionEnd.bind(this), false)
-      document.addEventListener('mousemove', this.move.bind(this), false)
-      document.addEventListener('mouseup', this.end.bind(this), false)
       document.addEventListener('touchmove', this.move.bind(this), false)
       document.addEventListener('touchend', this.end.bind(this), false)
       window.addEventListener('resize', this.onResize.bind(this), false)
@@ -203,7 +213,6 @@
       document.onmouseup = document.ontouchend = this.end.bind(this)
       window.onresize = this.onResize.bind(this)
     }
-
   }
 
   window.slideShow = slideShow
