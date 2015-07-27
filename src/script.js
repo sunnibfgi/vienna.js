@@ -105,12 +105,12 @@
   }
 
   slideShow.prototype.move = function(e) {
-    e.preventDefault()
 
     if(!this.el.contains(e.target)) {
       return false
     }
     if(this.isPress) {
+
       this.isMoving = true
     }
     var viewport = this.child[0].parentNode
@@ -127,7 +127,8 @@
       this.diffX = e.pageX - this.pageX
       this.diffY = e.pageY - this.pageY
     }
-    if(Math.abs(this.diffX) >= Math.abs(this.diffY)) {
+    if(this.isMoving && Math.abs(this.diffX) >= Math.abs(this.diffY)) {
+      e.preventDefault()
       setProp(viewport, {
         left: this.pos + this.diffX + 'px'
       })
