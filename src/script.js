@@ -1,5 +1,5 @@
 // script.js
-// last modify: 2015-07-27
+// last modify: 2015-07-29
 // low browser does not support certain features
 
 ;(function() {
@@ -81,10 +81,6 @@
 
   slideShow.prototype.start = function(e) {
     var viewport = this.child[0].parentNode
-
-    if(!isTouch()) {
-      e.preventDefault()
-    }
     if(isTouch()) {
       var touches = e.touches[0]
       this.pageX = touches.pageX
@@ -105,8 +101,7 @@
   }
 
   slideShow.prototype.move = function(e) {
-
-    if(!this.el.contains(e.target)) {
+    if(!this.el.contains(e.target) || e.touches.length > 1) {
       return false
     }
     if(this.isPress) {
@@ -138,6 +133,7 @@
   slideShow.prototype.end = function(e) {
     this.endTime = Date.now()
     var viewport = this.child[0].parentNode
+
     if(this.isMoving) {
       e.preventDefault()
       if(Math.abs(this.diffX) >= Math.abs(this.diffY)) {
